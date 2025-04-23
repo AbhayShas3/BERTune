@@ -239,11 +239,13 @@ class BERTFineTuner:
               save_steps: int = 500,
               fp16: bool = False,
               fp16_opt_level: Optional[str] = None,
+              adam_epsilon: float = 1e-8,
               logging_dir: Optional[str] = None,
               tensorboard: bool = False,
               disable_tqdm: bool = False,
               evaluation_strategy: str = "epoch",
-              save_total_limit: int = 3):
+              save_total_limit: int = 3,
+               **kwargs):
         """
         Train the model on the prepared datasets.
         
@@ -290,6 +292,7 @@ class BERTFineTuner:
             save_steps=save_steps,
             save_total_limit=save_total_limit,
             fp16=fp16,
+            adam_epsilon=adam_epsilon,
             disable_tqdm=disable_tqdm,
             load_best_model_at_end=True,
             report_to=["tensorboard"] if tensorboard else [],
