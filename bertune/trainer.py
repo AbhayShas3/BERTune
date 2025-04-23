@@ -319,13 +319,13 @@ class BERTFineTuner:
         logger.info(f"Saving final model to {self.output_dir}")
         self.trainer.save_model(self.output_dir)
         config_path = os.path.join(self.output_dir, "config.json")
-        if not os.path.exists(config_path):
-            config = {
-                "model_type": "bert",
-                "architectures": ["BertForSequenceClassification"]
-            }
-            with open(config_path, "w") as f:
-                json.dump(config, f)
+        # if not os.path.exists(config_path):
+        #     config = {
+        #         "model_type": "bert",
+        #         "architectures": ["BertForSequenceClassification"]
+        #     }
+        #     with open(config_path, "w") as f:
+        #         json.dump(config, f)
 
         self.tokenizer.save_pretrained(self.output_dir)
         
@@ -419,14 +419,14 @@ class BERTFineTuner:
             BERTFineTuner: A BERTFineTuner instance with the loaded model.
         """
 
-        config_path = os.path.join(model_path, "config.json")
-        if not os.path.exists(config_path):
-            config = {
-                "model_type": "bert",
-                "architectures": ["BertForSequenceClassification"]
-            }
-            with open(config_path, "w") as f:
-                json.dump(config, f)
+        # config_path = os.path.join(model_path, "config.json")
+        # if not os.path.exists(config_path):
+        #     config = {
+        #         "model_type": "bert",
+        #         "architectures": ["BertForSequenceClassification"]
+        #     }
+        #     with open(config_path, "w") as f:
+        #         json.dump(config, f)
         labels_path = os.path.join(model_path, "labels.json")
         task = "classification" if os.path.exists(labels_path) else "regression"
         
