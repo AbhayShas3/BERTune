@@ -6,7 +6,12 @@ import os
 import logging
 import click
 
-from .trainer import BERTFineTuner
+try:
+    from .trainer import BERTFineTuner
+    from .utils import load_dataset_from_file
+except ImportError:
+    from trainer import BERTFineTuner
+    from utils import load_dataset_from_file
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",

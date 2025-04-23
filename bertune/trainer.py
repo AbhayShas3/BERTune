@@ -18,7 +18,10 @@ from transformers import (
 )
 from datasets import Dataset, DatasetDict
 
-from .utils import load_dataset_from_file, save_labels, load_labels, get_compute_metrics
+try:
+    from .utils import load_dataset_from_file, save_labels, load_labels, get_compute_metrics
+except ImportError:
+    from utils import load_dataset_from_file, save_labels, load_labels, get_compute_metrics
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
