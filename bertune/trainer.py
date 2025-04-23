@@ -15,8 +15,11 @@ from transformers import (
     TrainingArguments,
     Trainer,
     EarlyStoppingCallback,
-    IntervalStrategy
 )
+from transformers.trainer_utils import IntervalStrategy
+
+
+
 from datasets import Dataset, DatasetDict
 
 try:
@@ -287,7 +290,7 @@ class BERTFineTuner:
             gradient_accumulation_steps=gradient_accumulation_steps,
             logging_dir=logging_dir,
             logging_steps=logging_steps,
-            evaluation_strategy=IntervalStrategy(evaluation_strategy),
+            evaluation_strategy=evaluation_strategy,
             eval_steps=eval_steps,
             save_steps=save_steps,
             save_total_limit=save_total_limit,
