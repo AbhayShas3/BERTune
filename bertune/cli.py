@@ -123,7 +123,7 @@ def finetune(dataset, validation_dataset, data_format, text_column, label_column
     tuner.configure_model(num_labels=num_labels, checkpoint=checkpoint)
     
     additional_args = {
-        "fp16_opt_level": fp16_opt_level if fp16 else None,
+        "fp16_opt_level": fp16_opt_level,,
         "adam_epsilon": adam_epsilon,
         "logging_first_step": logging_first_step,
         "disable_progress_bar": disable_progress_bar or disable_tqdm,

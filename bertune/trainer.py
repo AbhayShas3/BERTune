@@ -5,6 +5,7 @@ BERTune Trainer module
 import os
 import logging
 from typing import Dict, List, Optional, Union
+import json
 
 import torch
 import numpy as np
@@ -237,6 +238,7 @@ class BERTFineTuner:
               eval_steps: Optional[int] = None,
               save_steps: int = 500,
               fp16: bool = False,
+              fp16_opt_level: Optional[str] = None,
               logging_dir: Optional[str] = None,
               tensorboard: bool = False,
               disable_tqdm: bool = False,
@@ -310,6 +312,15 @@ class BERTFineTuner:
         
         logger.info(f"Saving final model to {self.output_dir}")
         self.trainer.save_model(self.output_dir)
+        config_path = os.path.join(self.output_dir, "config.json")
+        if not os.path.exists(config_path):
+            config = {
+                "model_type": "bert",
+                "architectures": ["BertForSequenceClassification"]
+            }
+            with open(config_path, "w") as f:
+                json.dump(config, f)
+
         self.tokenizer.save_pretrained(self.output_dir)
         
         metrics = train_result.metrics
@@ -401,6 +412,16 @@ class BERTFineTuner:
         Returns:
             BERTFineTuner: A BERTFineTuner instance with the loaded model.
         """
+
+        config_path = os.path.join(model_path, "config.json")
+        if not os.path.exists(config_path):
+            import json
+            config = {
+                "model_type": "bert",
+                "architectures": ["BertForSequenceClassification"]
+            }
+            with open(config_path, "w") as f:
+                json.dump(config, f)
         labels_path = os.path.join(model_path, "labels.json")
         task = "classification" if os.path.exists(labels_path) else "regression"
         
