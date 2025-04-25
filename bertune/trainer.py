@@ -356,28 +356,63 @@ class BERTFineTuner:
     
     def evaluate(self, test_dataset: Optional[Dataset] = None):
         """
-        Evaluate the fine-tuned model.
-        
+        Evaluate the fine-tuned model. Can be called after training or on a loaded model.
+
         Args:
-            test_dataset (Dataset, optional): Dataset for evaluation.
-            
+            test_dataset (Dataset, optional): Dataset for evaluation. If None and called
+                                              after train(), uses the validation set from training.
+
         Returns:
             Dict: Evaluation results.
         """
-        if self.trainer is None:
-            raise ValueError("Trainer not initialized. Call train() first or load a trained model.")
-        
-        eval_dataset = test_dataset if test_dataset is not None else self.trainer.eval_dataset
-        
-        if eval_dataset is None:
-            raise ValueError("No evaluation dataset provided.")
-        
-        logger.info("Starting evaluation")
-        metrics = self.trainer.evaluate(eval_dataset)
-        
-        self.trainer.log_metrics("eval", metrics)
-        self.trainer.save_metrics("eval", metrics)
-        
+        if self.model is None:
+             raise ValueError("Model not loaded. Train or load a model first.")
+
+        compute_metrics_fn = get_compute_metrics(self.task)
+
+        if self.trainer is not None:
+            
+            logger.info("Using existing trainer instance for evaluation.")
+            eval_dataset_to_use = test_dataset if test_dataset is not None else self.trainer.eval_dataset
+            if eval_dataset_to_use is None:
+                 raise ValueError("No evaluation dataset provided or found in trainer.")
+            metrics = self.trainer.evaluate(eval_dataset=eval_dataset_to_use)
+            self.trainer.log_metrics("eval", metrics)
+            self.trainer.save_metrics("eval", metrics)
+
+        else:
+            logger.info("Creating temporary trainer instance for evaluation.")
+            if test_dataset is None:
+                raise ValueError("Evaluation dataset must be provided when evaluating a loaded model.")
+
+          
+            temp_eval_output_dir = os.path.join(self.output_dir, "temp_eval")
+            os.makedirs(temp_eval_output_dir, exist_ok=True)
+
+            eval_args = TrainingArguments(
+                output_dir=temp_eval_output_dir,
+                per_device_eval_batch_size=16, 
+                logging_dir=os.path.join(temp_eval_output_dir, "logs"),
+                report_to=[],
+            )
+
+            temp_trainer = Trainer(
+                model=self.model,
+                args=eval_args,
+                eval_dataset=test_dataset,
+                tokenizer=self.tokenizer,
+                compute_metrics=compute_metrics_fn,
+                # No train_dataset, no callbacks needed for eval-only
+            )
+
+            metrics = temp_trainer.evaluate()
+            # Log/save metrics using the temporary trainer's methods
+            temp_trainer.log_metrics("eval", metrics)
+            # Save metrics to the *original* output directory
+            temp_trainer.save_metrics("eval", metrics, metric_key_prefix="eval")
+            # Clean up temp dir? Optional.
+
+        logger.info(f"Evaluation finished. Metrics: {metrics}")
         return metrics
     
     def predict(self, texts: List[str]):
