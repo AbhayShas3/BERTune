@@ -294,7 +294,9 @@ class BERTFineTuner:
         except Exception as e:
             logger.error(f"DEBUG: Failed to inspect TrainingArguments: {e}")
         logger.info("-" * 50)
-            
+        
+        eval_save_strategy = IntervalStrategy(evaluation_strategy)
+
         training_args = TrainingArguments(
             output_dir=self.output_dir,
             learning_rate=learning_rate,
@@ -306,9 +308,10 @@ class BERTFineTuner:
             gradient_accumulation_steps=gradient_accumulation_steps,
             logging_dir=logging_dir,
             logging_steps=logging_steps,
-            eval_strategy=IntervalStrategy(evaluation_strategy),
-            eval_steps=eval_steps,
-            save_steps=save_steps,
+            eval_strategy=eval_save_strategy, 
+            save_strategy=eval_save_strategy, 
+            eval_steps=eval_steps,             
+            save_steps=save_steps,             
             save_total_limit=save_total_limit,
             fp16=fp16,
             adam_epsilon=adam_epsilon,
