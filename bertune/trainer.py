@@ -18,7 +18,8 @@ from transformers import (
 )
 from transformers.trainer_utils import IntervalStrategy
 
-
+import transformers
+import inspect
 
 from datasets import Dataset, DatasetDict
 
@@ -278,6 +279,21 @@ class BERTFineTuner:
             
         if logging_dir is None:
             logging_dir = os.path.join(self.output_dir, "logs")
+        #Logging
+        logger.info("-" * 50)
+        logger.info(f"DEBUG: Attempting to use TrainingArguments")
+        logger.info(f"DEBUG:   - transformers version: {transformers.__version__}")
+        try:
+            logger.info(f"DEBUG:   - TrainingArguments imported from: {inspect.getfile(TrainingArguments)}")
+            sig = inspect.signature(TrainingArguments.__init__)
+            logger.info(f"DEBUG:   - TrainingArguments.__init__ signature parameters: {list(sig.parameters.keys())}")
+            if 'evaluation_strategy' in sig.parameters:
+                 logger.info("DEBUG:   - 'evaluation_strategy' IS present in signature.")
+            else:
+                 logger.error("DEBUG:   - 'evaluation_strategy' IS MISSING from signature!")
+        except Exception as e:
+            logger.error(f"DEBUG: Failed to inspect TrainingArguments: {e}")
+        logger.info("-" * 50)
             
         training_args = TrainingArguments(
             output_dir=self.output_dir,
