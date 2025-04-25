@@ -306,7 +306,7 @@ class BERTFineTuner:
             gradient_accumulation_steps=gradient_accumulation_steps,
             logging_dir=logging_dir,
             logging_steps=logging_steps,
-            evaluation_strategy=IntervalStrategy(evaluation_strategy),
+            eval_strategy=IntervalStrategy(evaluation_strategy),
             eval_steps=eval_steps,
             save_steps=save_steps,
             save_total_limit=save_total_limit,
