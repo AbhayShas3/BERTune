@@ -1,12 +1,3 @@
 # BERTune
 
-.
-├── README.md
-├── bertune
-│   ├── __init__.py
-│   ├── __main__.py
-│   ├── cli.py
-│   ├── trainer.py
-│   └── utils.py
-├── requirements.txt
-└── setup.py
+A python CLI tool to fine-tune BERT models on custom datasets currently UNDER CONSTRUCTION
